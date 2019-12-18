@@ -58,7 +58,7 @@ clean:
 	find . -name \*.pyc | xargs rm 
 
 Pipfile.lock: Pipfile setup.py
-	rm requirements.txt
+	rm -rf requirements.txt
 	pipenv install -d
 	pipenv install
 
