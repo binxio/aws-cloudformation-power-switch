@@ -13,7 +13,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name='aws-cloudformation-power-switch',
     version="0.1.4",
-    url='https://github.com/binxio/aws-cloudformation-power-off',
+    url='https://github.com/binxio/aws-cloudformation-power-switch',
     license='BSD',
     author='Mark van Holsteijn',
     author_email='mark@binx.io',
@@ -31,7 +31,7 @@ setup(
     test_suite='tests',
     entry_points={
         'console_scripts': [
-            'aws-cfn-power-off = aws_cloudformation_power_off.__main__:main'
+            'aws-cfn-power-switch = aws_cloudformation_power_switch.__main__:main'
         ],
     },
     classifiers=[
