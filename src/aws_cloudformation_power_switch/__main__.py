@@ -4,13 +4,13 @@ import click
 
 from aws_cloudformation_power_switch.master import power_switch
 
-@click.group()
+@click.group(help="power off all running instances managed by CloudFormation stacks")
 @click.pass_context
-@click.option('--region', '-r', help='to use')
-@click.option('--profile', '-p', help='to use')
-@click.option('--stack-name-prefix', '-s', required=True, help='of stacks to shutdown/startup')
-@click.option('--verbose', '-v', is_flag=True, default=False, help='output')
+@click.option('--stack-name-prefix', '-s', required=True, help='of stacks to startup/shutdown')
 @click.option('--dry-run', '-d', is_flag=True, default=False, help='do not change anything, just show what is going to happen')
+@click.option('--profile', '-p', help='to use')
+@click.option('--region', '-r', help='to use')
+@click.option('--verbose', '-v', is_flag=True, default=False, help='output')
 def main(ctx,**kwargs):
     ctx.obj = power_switch(**kwargs)
 
