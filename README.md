@@ -12,7 +12,7 @@ pip install aws-cloudformation-power-switch
 ## shutdown
 to shutdown all instances managed by CloudFormation stacks starting with the name `dev`, type:
 ```sh
-aws-cfn-power-switch --dry-run --stack-name-prefix dev shutdown
+aws-cfn-power-switch --dry-run --stack-name-prefix dev on
 ```
 This will show you which EC2, RDS and AutoScaling instances will be shutdown. For Auto Scaling groups, the 
 desired number of instances is set to 0. If the minimum is greater than 0, it will change the minimum setting too.
@@ -20,7 +20,7 @@ desired number of instances is set to 0. If the minimum is greater than 0, it wi
 ## startup`
 to startup all instances managed by a CloudFormation stacks starting with the name `dev`, type:
 ```sh
-aws-cfn-power-switch --dry-run --stack-name-prefix dev startup
+aws-cfn-power-switch --dry-run --stack-name-prefix dev off
 ```
 This will show you which EC2, RDS and AutoScaling instances will be started. The AutoScaling desired number of 
 instances will be set the maximum desired instances.
@@ -42,11 +42,3 @@ aws cloudformation deploy \
 ```
 This will shutdown down all EC2, RDS and Auto Scaling instances managed by CloudFormation stacks starting with the
 name `dev` at 23:30 and start them backup at 7:30 in the morning.
-
-
-## verbose
-
-```sh
-export LOG_LEVEL=INFO
-cwlog-minder ...
-```
