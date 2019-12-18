@@ -23,7 +23,8 @@ to startup all instances managed by a CloudFormation stacks starting with the na
 aws-cfn-power-switch --dry-run --stack-name-prefix dev off
 ```
 This will show you which EC2, RDS and AutoScaling instances will be started. The AutoScaling desired number of 
-instances will be set the maximum desired instances.
+instances will be set the maximum desired instances. Remove the `--dry-run` and it will be activated.
+
 
 ## deploy the power switch
 To deploy the power switch as an AWS Lambda, type:
@@ -42,3 +43,6 @@ aws cloudformation deploy \
 ```
 This will shutdown down all EC2, RDS and Auto Scaling instances managed by CloudFormation stacks starting with the
 name `dev` at 23:30 and start them backup at 7:30 in the morning.
+
+## caveats
+the RDS clusters are not detected as CloudFormation does not place `aws:cloudformation:` tags on the resource.
