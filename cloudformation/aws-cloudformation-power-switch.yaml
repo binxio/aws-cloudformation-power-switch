@@ -1,0 +1,77 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  LambdaS3Bucket:
+    Type: String
+    Default: ''
+  LambdaZipFileName:
+    Type: String
+    Default: lambdas/aws-cloudwatch-power-switch-0.2.4.zip
+
+Conditions:
+  UsePublicBucket: !Equals
+    - !Ref 'LambdaS3Bucket'
+    - ''
+
+Resources:
+  CloudFormationPowerSwitch:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: power on/off button for CloudFormation stacks
+      FunctionName: aws-cloudformation-power-switch
+      Code:
+        S3Bucket: !If
+          - UsePublicBucket
+          - !Sub 'binxio-public-${AWS::Region}'
+          - !Ref 'LambdaS3Bucket'
+        S3Key: !Ref 'LambdaZipFileName'
+      Handler: aws_cloudformation_power_switch.handler
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 900
+
+  Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+            - ec2:DescribeInstances
+            - ec2:StartInstances
+            - ec2:StopInstances
+            - rds:ListTagsForResource
+            - rds:DescribeDBInstances
+            - rds:StartDBInstance
+            - rds:StopDBInstance
+            - rds:DescribeDBClusters
+            - rds:StartDBCluster
+            - rds:StopDBCluster
+            - autoscaling:UpdateAutoScalingGroup
+            - autoscaling:DescribeAutoScalingGroups
+          Resource: "*"
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - !Ref Policy
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+
+  CloudFormationPowerSwitchSchedulePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt CloudFormationPowerSwitch.Arn
+      Principal: events.amazonaws.com

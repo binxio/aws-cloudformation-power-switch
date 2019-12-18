@@ -1,0 +1,41 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  StackNamePrefix:
+    Description: 'of the stacks to switch on or off'
+    Type: String
+    Default: aws-cloudformation-power-switch
+  StartupSchedule:
+    Description: 'to switch the stack on'
+    Type: String
+    Default: 'cron(30 7 ? * MON-FRI *)'
+  ShutdownSchedule:
+    Description: 'to switch the stack off'
+    Type: String
+    Default: 'cron(30 23 ? * MON-FRI *)'
+
+Resources:
+  StartupScheduleRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: aws-cloudformation-power-on
+      Description: !Sub 'switch on stacks with prefix ${StackNamePrefix}'
+      ScheduleExpression: !Ref StartupSchedule
+      State: ENABLED
+      Targets:
+        - Id: aws-cloudformation-power-switch-on
+          Arn: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:aws-cloudformation-power-switch'
+          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${StackNamePrefix}", "state" : "on"}'
+  
+  ShutdownScheduleRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: aws-cloudformation-power-off
+      Description: !Sub 'switch off stacks with prefix ${StackNamePrefix}'
+      ScheduleExpression: !Ref ShutdownSchedule
+      State: ENABLED
+      Targets:
+        - Id: aws-cloudformation-power-switch-off
+          Arn: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:aws-cloudformation-power-switch'
+          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${StackNamePrefix}", "state" : "off"}'
