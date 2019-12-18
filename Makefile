@@ -45,7 +45,7 @@ upload-dist:
 	pipenv run python setup.py sdist
 	pipenv run twine upload dist/*
 
-target/$(NAME)-$(VERSION).zip: src/*/*.py requirements.txt Dockerfile.lambda
+target/$(NAME)-$(VERSION).zip: src/*/*.py Dockerfile.lambda
 	mkdir -p target
 	docker build --build-arg ZIPFILE=$(NAME)-$(VERSION).zip -t $(NAME)-lambda:$(VERSION) -f Dockerfile.lambda . && \
 		ID=$$(docker create $(NAME)-lambda:$(VERSION) /bin/true) && \
@@ -54,16 +54,12 @@ target/$(NAME)-$(VERSION).zip: src/*/*.py requirements.txt Dockerfile.lambda
 		chmod ugo+r target/$(NAME)-$(VERSION).zip
 
 clean:
-	rm -rf target requirements.txt
+	rm -rf target
 	find . -name \*.pyc | xargs rm 
 
 Pipfile.lock: Pipfile setup.py
-	rm -rf requirements.txt
 	pipenv install -d
 	pipenv install
-
-requirements.txt: Pipfile.lock
-	jq -r '.default |to_entries | map(select(.value.editable | not) | (.key + .value.version)) | .[] |.' Pipfile.lock > requirements.txt
 
 test: Pipfile.lock
 	for i in $$PWD/cloudformation/*; do \
