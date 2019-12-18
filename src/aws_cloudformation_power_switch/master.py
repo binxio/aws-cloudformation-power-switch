@@ -1,11 +1,8 @@
-import os
-import logging
-
 from .asg import ASGPowerSwitch
 from .ec2 import EC2PowerSwitch
+from .power_switch import PowerSwitch
 from .rds import RDSPowerSwitch
 from .rds_cluster import RDSClusterPowerSwitch
-from .power_switch import PowerSwitch
 
 
 class MasterPowerSwitch(PowerSwitch):
@@ -35,7 +32,6 @@ class MasterPowerSwitch(PowerSwitch):
 
 
 def power_switch(stack_name_prefix, dry_run=True, verbose=False, profile=None, region=None):
-    logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
     result = MasterPowerSwitch()
     result.set_session(profile, region)
     result.dry_run = dry_run

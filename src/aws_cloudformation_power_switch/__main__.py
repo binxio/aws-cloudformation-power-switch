@@ -12,6 +12,7 @@ from aws_cloudformation_power_switch.master import power_switch
 @click.option('--region', '-r', help='to use')
 @click.option('--verbose', '-v', is_flag=True, default=False, help='output')
 def main(ctx,**kwargs):
+    logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
     ctx.obj = power_switch(**kwargs)
 
 @main.command(name='on', help="start all ec2, rds and auto scaling instances")

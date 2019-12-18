@@ -1,9 +1,7 @@
 import logging
-from typing import List
-
 
 from aws_cloudformation_power_switch.power_switch import PowerSwitch
-from aws_cloudformation_power_switch.tag import stack_name, logical_id
+from aws_cloudformation_power_switch.tag import logical_id, stack_name
 
 
 class EC2PowerSwitch(PowerSwitch):

@@ -1,10 +1,9 @@
 import logging
-from typing import List
 
+from botocore.exceptions import ClientError
 
 from aws_cloudformation_power_switch.power_switch import PowerSwitch
-from aws_cloudformation_power_switch.tag import stack_name, logical_id
-from botocore.exceptions import ClientError
+from aws_cloudformation_power_switch.tag import logical_id, stack_name
 
 
 class RDSClusterPowerSwitch(PowerSwitch):
@@ -45,7 +44,6 @@ class RDSClusterPowerSwitch(PowerSwitch):
 
     def select_instances(self):
         result = []
-        tags = {}
         paginator = self.rds.get_paginator("describe_db_clusters")
         for response in paginator.paginate():
             for instance in response["DBClusters"]:

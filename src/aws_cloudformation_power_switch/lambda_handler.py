@@ -1,3 +1,4 @@
+import os
 import jsonschema
 import logging
 from .master import power_switch
@@ -40,6 +41,7 @@ def is_valid_request(request) -> bool:
 
 
 def handler(request, context):
+    logging.getLogger().setLevel(os.getenv("LOG_LEVEL", "INFO"))
     if is_valid_request(request):
         state = request["state"]
         request.pop("state")
