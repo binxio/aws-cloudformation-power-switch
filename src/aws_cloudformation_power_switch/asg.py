@@ -12,13 +12,12 @@ class ASGPowerSwitch(PowerSwitch):
 
     def startup(self, instance: dict):
         name = instance["AutoScalingGroupName"]
-        desired_capacity = instance["DesiredCapacity"]
         max_size = instance["MaxSize"]
 
         logging.info("setting capacity of auto scaling group %s (%s) to %s", logical_id(instance), name, max_size)
         if not self.dry_run:
             self.autoscaling.update_auto_scaling_group(
-                AutoScalingGroupName=name, DesiredCapacity=desired_capacity
+                AutoScalingGroupName=name, DesiredCapacity=max_size
             )
 
     def shutdown(self, instance: dict):
