@@ -12,7 +12,7 @@ pip install aws-cloudformation-power-switch
 ## shutdown
 to shutdown all instances managed by CloudFormation stacks starting with the name `dev`, type:
 ```sh
-aws-cfn-power-switch --dry-run --stack-name-prefix dev on
+cfn-power-switch --dry-run --stack-name-prefix dev on
 ```
 This will show you which EC2, RDS and AutoScaling instances will be shutdown. For Auto Scaling groups, the 
 desired number of instances is set to 0. If the minimum is greater than 0, it will change the minimum setting too.
@@ -20,7 +20,7 @@ desired number of instances is set to 0. If the minimum is greater than 0, it wi
 ## startup`
 to startup all instances managed by a CloudFormation stacks starting with the name `dev`, type:
 ```sh
-aws-cfn-power-switch --dry-run --stack-name-prefix dev off
+cfn-power-switch --dry-run --stack-name-prefix dev off
 ```
 This will show you which EC2, RDS and AutoScaling instances will be started. The AutoScaling desired number of 
 instances will be set the maximum desired instances. Remove the `--dry-run` and it will be activated.
@@ -30,8 +30,8 @@ instances will be set the maximum desired instances. Remove the `--dry-run` and 
 To deploy the power switch as an AWS Lambda, type:
 
 ```sh
-git clone https://github.com/binxio/aws-cloudwatch-log-minder.git
-cd aws-cloudwatch-log-minder
+git clone https://github.com/binxio/aws-cloudformation-power-switch.git
+cd aws-cloudformation-power-switch.git
 aws cloudformation deploy \
 	--capabilities CAPABILITY_IAM \
 	--stack-name aws-cloudformation-power-switch \

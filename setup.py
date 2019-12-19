@@ -31,7 +31,7 @@ setup(
     test_suite='tests',
     entry_points={
         'console_scripts': [
-            'aws-cfn-power-switch = aws_cloudformation_power_switch.__main__:main'
+            'cfn-power-switch = aws_cloudformation_power_switch.__main__:main'
         ],
     },
     classifiers=[
