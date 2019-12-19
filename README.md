@@ -35,14 +35,39 @@ cd aws-cloudformation-power-switch.git
 aws cloudformation deploy \
 	--capabilities CAPABILITY_IAM \
 	--stack-name aws-cloudformation-power-switch \
-	--template-file ./cloudformation/aws-cloudformation-power-switch.yaml \
-    --override-parameters \
-        StackNamePrefix=dev \
-	    "Startup=cron(30 7 ? * MON-FRI *)" \
-        "Shutdown=cron(30 23 ? * MON-FRI *)"
+	--template-file ./cloudformation/aws-cloudformation-power-switch.yaml
+```
+
+## Demo
+install the demonstration, type:
+```
+aws cloudformation deploy \
+	--capabilities CAPABILITY_IAM \
+	--stack-name aws-cloudformation-power-switch-demo \
+	--template-file ./cloudformation/demo-stack.yaml
 ```
 This will shutdown down all EC2, RDS and Auto Scaling instances managed by CloudFormation stacks starting with the
 name `dev` at 23:30 and start them backup at 7:30 in the morning.
 
+To manual stop all the instance, type:
+
+```
+cfn-power-switch --verbose --stack-name-prefix aws-cloudformation-power-switch off
+```
+It wil take few minutes before everything is shutdown and you can restart the stack.
+
+to start everything back up, type:
+
+```
+cfn-power-switch --verbose --stack-name-prefix aws-cloudformation-power-switch off
+```
+It wil take few minutes before everything is running again.
+
+Do not forget to delete the stack:
+
+```
+aws cloudformation delete-stack --stack-name aws-cloudformation-power-switch-demo
+```
+
 ## caveats
-the RDS clusters are not detected as CloudFormation does not place `aws:cloudformation:` tags on the resource.
+The RDS clusters are not detected as CloudFormation does not place `aws:cloudformation:` tags on the cluster resource. 

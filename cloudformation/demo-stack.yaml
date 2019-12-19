@@ -2,40 +2,62 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
-  StackNamePrefix:
-    Description: 'of the stacks to switch on or off'
-    Type: String
-    Default: aws-cloudformation-power-switch
-  StartupSchedule:
-    Description: 'to switch the stack on'
-    Type: String
-    Default: 'cron(30 7 ? * MON-FRI *)'
-  ShutdownSchedule:
-    Description: 'to switch the stack off'
-    Type: String
-    Default: 'cron(30 23 ? * MON-FRI *)'
+  AmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-x86_64-ebs'
 
 Resources:
   StartupScheduleRule:
     Type: AWS::Events::Rule
     Properties:
       Name: aws-cloudformation-power-on
-      Description: !Sub 'switch on stacks with prefix ${StackNamePrefix}'
-      ScheduleExpression: !Ref StartupSchedule
+      Description: !Sub 'switch on stacks with prefix ${AWS::StackName}'
+      ScheduleExpression: 'cron(30 7 ? * MON-FRI *)'
       State: ENABLED
       Targets:
         - Id: aws-cloudformation-power-switch-on
           Arn: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:aws-cloudformation-power-switch'
-          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${StackNamePrefix}", "state" : "on"}'
+          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${AWS::StackName}}", "state" : "on"}'
   
   ShutdownScheduleRule:
     Type: AWS::Events::Rule
     Properties:
       Name: aws-cloudformation-power-off
-      Description: !Sub 'switch off stacks with prefix ${StackNamePrefix}'
-      ScheduleExpression: !Ref ShutdownSchedule
+      Description: !Sub 'switch off stacks with prefix ${AWS::StackName}'
+      ScheduleExpression: 'cron(30 23 ? * MON-FRI *)'
       State: ENABLED
       Targets:
         - Id: aws-cloudformation-power-switch-off
           Arn: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:aws-cloudformation-power-switch'
-          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${StackNamePrefix}", "state" : "off"}'
+          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${AWS::StackName}", "state" : "off"}'
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: t3.nano
+
+  LaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: t3.nano
+
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:  !GetAZs
+      LaunchConfigurationName: !Ref LaunchConfiguration
+      MinSize: '0'
+      MaxSize: '2'
+      DesiredCapacity: '1'
+
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: '5'
+      DBInstanceClass: db.t3.micro
+      Engine: MySQL
+      MasterUsername: MyName
+      MasterUserPassword: MyPassword
+    DeletionPolicy: Snapshot
