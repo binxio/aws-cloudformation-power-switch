@@ -12,7 +12,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='aws-cloudformation-power-switch',
-    version="0.1.7",
+    version="0.1.8",
     url='https://github.com/binxio/aws-cloudformation-power-switch',
     license='BSD',
     author='Mark van Holsteijn',
