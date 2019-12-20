@@ -51,6 +51,8 @@ Resources:
             - rds:StopDBCluster
             - autoscaling:UpdateAutoScalingGroup
             - autoscaling:DescribeAutoScalingGroups
+            - cloudformation:DescribeStacks
+            - cloudformation:ListStackResources
           Resource: "*"
 
   LambdaRole:

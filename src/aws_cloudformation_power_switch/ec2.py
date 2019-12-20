@@ -17,6 +17,9 @@ class EC2PowerSwitch(PowerSwitch):
     def instance_state(self, instance) -> str:
         return instance.get("State", {}).get("Name", "unknown")
 
+    def instance_id(self, instance) -> str:
+        return instance.get("InstanceId")
+
     def instance_needs_shutdown(self, instance) -> bool:
         return self.instance_state(instance) == "running"
 
@@ -52,7 +55,7 @@ class EC2PowerSwitch(PowerSwitch):
                 i.get("State", {}).get("Name", "unknown"),
             )
 
-        if not result:
+        if not result and self.verbose:
             logging.info("no EC2 instances found")
 
         return result

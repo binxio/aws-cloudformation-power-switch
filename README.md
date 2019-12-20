@@ -65,6 +65,6 @@ Do not forget to delete the stack:
 aws cloudformation delete-stack --stack-name aws-cloudformation-power-switch-demo
 ```
 
-## caveats
-The RDS clusters are not detected as CloudFormation does not place `aws:cloudformation:` tags on the cluster resource.  Will fix this
-by querying the stack resources instead. A PR is welcome!
+## Caveats
+- The power switch will only start instances in `stopped` state`, and stop instances in the `available` or `running` state. If it is transitioning between states, no action is taken.
+- As CloudFormation does not place the `aws:cloudformation:` tags on RDS Aurora Clusters, we need to load all CloudFormation stacks and resources to find out whether we need to start or stop it. And listing all CloudFormation stacks is very, very slow...

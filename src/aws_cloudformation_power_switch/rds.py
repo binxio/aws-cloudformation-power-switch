@@ -59,11 +59,11 @@ class RDSPowerSwitch(PowerSwitch):
 
         for i in filter(lambda i: self.verbose, result):
             logging.info(
-                "db instance %s (%s) in state %s"
+                "rds instance %s (%s) in state %s"
                 % (logical_id(i), i["DBInstanceIdentifier"], i["DBInstanceStatus"])
             )
 
-        if not result:
-            logging.info("No RDS instances found (todo)")
+        if not result and self.verbose:
+            logging.info("No RDS instances found")
 
         return result

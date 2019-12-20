@@ -60,7 +60,7 @@ class ASGPowerSwitch(PowerSwitch):
                     i["DesiredCapacity"],
                 )
 
-        if not result:
+        if not result and self.verbose:
             logging.info("No auto scaling groups found")
 
         return result

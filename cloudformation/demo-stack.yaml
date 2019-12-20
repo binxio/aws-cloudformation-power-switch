@@ -61,3 +61,20 @@ Resources:
       MasterUsername: MyName
       MasterUserPassword: MyPassword
     DeletionPolicy: Snapshot
+
+  DatabaseCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora
+      EngineMode: serverless
+      MasterUsername: MyName
+      MasterUserPassword: MyPassword
+
+#  RDSDBInstance1:
+#    Type: "AWS::RDS::DBInstance"
+#    Properties:
+#      AvailabilityZone: !Select [0, !GetAZs]
+#      DBClusterIdentifier: !Ref DatabaseCluster
+#      DBInstanceClass: db.t3.micro
+#      Engine: aurora
+#
