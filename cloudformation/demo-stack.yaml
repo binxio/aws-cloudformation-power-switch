@@ -59,7 +59,8 @@ Resources:
       DBInstanceClass: db.t3.micro
       Engine: MySQL
       MasterUsername: MyName
-      MasterUserPassword: MyPassword
+      MasterUserPassword:
+        Fn::Base64: !Ref AWS::AccountId
     DeletionPolicy: Snapshot
 
   DatabaseCluster:
@@ -68,13 +69,5 @@ Resources:
       Engine: aurora
       EngineMode: serverless
       MasterUsername: MyName
-      MasterUserPassword: MyPassword
-
-#  RDSDBInstance1:
-#    Type: "AWS::RDS::DBInstance"
-#    Properties:
-#      AvailabilityZone: !Select [0, !GetAZs]
-#      DBClusterIdentifier: !Ref DatabaseCluster
-#      DBInstanceClass: db.t3.micro
-#      Engine: aurora
-#
+      MasterUserPassword:
+       Fn::Base64: !Ref AWS::AccountId
