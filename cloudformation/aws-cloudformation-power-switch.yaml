@@ -56,7 +56,7 @@ Resources:
             - ecs:ListClusters
             - ecs:ListServices
             - ecs:DescribeServices
-            -
+            - tag:GetResources
           Resource: "*"
 
   LambdaRole:
