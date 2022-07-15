@@ -3,7 +3,7 @@ RUN yum install -y zip
 WORKDIR /lambda
 
 ADD src/ /lambda/
-RUN pip install --quiet -t /lambda -r /lambda/aws_cloudformation_power_switch.egg-info/requires.txt
+RUN pip install --quiet -t /lambda -r requirements.txt
 RUN find /lambda -type d | xargs -n 1 -I {} chmod ugo+rx "{}" && \
     find /lambda -type f | xargs -n 1 -I {} chmod ugo+r "{}"
 
