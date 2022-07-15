@@ -2,72 +2,200 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
+  VPC:
+    Type: AWS::EC2::VPC::Id
+
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+
   AmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-minimal-hvm-x86_64-ebs'
 
 Resources:
-  StartupScheduleRule:
-    Type: AWS::Events::Rule
-    Properties:
-      Name: aws-cloudformation-power-on
-      Description: !Sub 'switch on stacks with prefix ${AWS::StackName}'
-      ScheduleExpression: 'cron(30 7 ? * MON-FRI *)'
-      State: ENABLED
-      Targets:
-        - Id: aws-cloudformation-power-switch-on
-          Arn: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:aws-cloudformation-power-switch'
-          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${AWS::StackName}}", "state" : "on"}'
-  
-  ShutdownScheduleRule:
-    Type: AWS::Events::Rule
-    Properties:
-      Name: aws-cloudformation-power-off
-      Description: !Sub 'switch off stacks with prefix ${AWS::StackName}'
-      ScheduleExpression: 'cron(30 23 ? * MON-FRI *)'
-      State: ENABLED
-      Targets:
-        - Id: aws-cloudformation-power-switch-off
-          Arn: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:aws-cloudformation-power-switch'
-          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${AWS::StackName}", "state" : "off"}'
+#  StartupScheduleRule:
+#    Type: AWS::Events::Rule
+#    Properties:
+#      Name: aws-cloudformation-power-on
+#      Description: !Sub 'switch on stacks with prefix ${AWS::StackName}'
+#      ScheduleExpression: 'cron(30 7 ? * MON-FRI *)'
+#      State: ENABLED
+#      Targets:
+#        - Id: aws-cloudformation-power-switch-on
+#          Arn: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:aws-cloudformation-power-switch'
+#          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${AWS::StackName}}", "state" : "on"}'
+#
+#  ShutdownScheduleRule:
+#    Type: AWS::Events::Rule
+#    Properties:
+#      Name: aws-cloudformation-power-off
+#      Description: !Sub 'switch off stacks with prefix ${AWS::StackName}'
+#      ScheduleExpression: 'cron(30 23 ? * MON-FRI *)'
+#      State: ENABLED
+#      Targets:
+#        - Id: aws-cloudformation-power-switch-off
+#          Arn: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:aws-cloudformation-power-switch'
+#          Input: !Sub '{"dry_run": false, "verbose": true, "stack_name_prefix": "${AWS::StackName}", "state" : "off"}'
 
-  EC2Instance:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: !Ref AmiId
-      InstanceType: t3.nano
+#  EC2Instance:
+#    Type: AWS::EC2::Instance
+#    Properties:
+#      ImageId: !Ref AmiId
+#      InstanceType: t3.nano
+#
+#  LaunchConfiguration:
+#    Type: AWS::AutoScaling::LaunchConfiguration
+#    Properties:
+#      ImageId: !Ref AmiId
+#      InstanceType: t3.nano
+#
+#  AutoScalingGroup:
+#    Type: AWS::AutoScaling::AutoScalingGroup
+#    Properties:
+#      AvailabilityZones:  !GetAZs
+#      LaunchConfigurationName: !Ref LaunchConfiguration
+#      MinSize: '0'
+#      MaxSize: '2'
+#      DesiredCapacity: '1'
+#
+#  DBInstance:
+#    Type: AWS::RDS::DBInstance
+#    Properties:
+#      AllocatedStorage: '5'
+#      DBInstanceClass: db.t3.micro
+#      Engine: MySQL
+#      MasterUsername: MyName
+#      MasterUserPassword:
+#        Fn::Base64: !Ref AWS::AccountId
+#    DeletionPolicy: Snapshot
+#
+#  DatabaseCluster:
+#    Type: AWS::RDS::DBCluster
+#    Properties:
+#      Engine: aurora
+#      EngineMode: serverless
+#      MasterUsername: MyName
+#      MasterUserPassword:
+#       Fn::Base64: !Ref AWS::AccountId
+#
 
-  LaunchConfiguration:
-    Type: AWS::AutoScaling::LaunchConfiguration
+  Cluster:
+    Type: AWS::ECS::Cluster
     Properties:
-      ImageId: !Ref AmiId
-      InstanceType: t3.nano
+      ClusterName: back-office-power-switch-demo
 
-  AutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      AvailabilityZones:  !GetAZs
-      LaunchConfigurationName: !Ref LaunchConfiguration
-      MinSize: '0'
-      MaxSize: '2'
-      DesiredCapacity: '1'
 
-  DBInstance:
-    Type: AWS::RDS::DBInstance
+  Service:
+    Type: AWS::ECS::Service
     Properties:
-      AllocatedStorage: '5'
-      DBInstanceClass: db.t3.micro
-      Engine: MySQL
-      MasterUsername: MyName
-      MasterUserPassword:
-        Fn::Base64: !Ref AWS::AccountId
-    DeletionPolicy: Snapshot
+      Cluster: !Ref Cluster
+      LaunchType: FARGATE
+      DesiredCount: 1
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref ServiceSecurityGroup
+          Subnets: !Ref Subnets
+      TaskDefinition: !Ref TaskDefinition
 
-  DatabaseCluster:
-    Type: AWS::RDS::DBCluster
+  ServiceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      Engine: aurora
-      EngineMode: serverless
-      MasterUsername: MyName
-      MasterUserPassword:
-       Fn::Base64: !Ref AWS::AccountId
+      GroupDescription: !Ref AWS::StackName
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: icmp
+          FromPort: 8
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref AWS::StackName
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: '256'
+      Memory: '512'
+      TaskRoleArn: !GetAtt TaskRole.Arn
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+
+      ContainerDefinitions:
+        - Name: nginx
+          Image: public.ecr.aws/nginx/nginx:stable
+          PseudoTerminal: true
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+          HealthCheck:
+            Command:
+              - curl -sS -o /dev/null http://localhost
+            StartPeriod: 10
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns: []
+      Policies:
+        - PolicyName: AllowExec
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssmmessages:CreateControlChannel
+                  - ssmmessages:CreateDataChannel
+                  - ssmmessages:OpenControlChannel
+                  - ssmmessages:OpenDataChannel
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - logs:DescribeLogGroups
+                Resource: '*'
+
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: TaskExecutePermission
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'

@@ -1,6 +1,6 @@
 # AWS CloudFormation power switch
-AWS CloudFormation power switch allows you to shutdown and startup all EC2, RDS and AutoScaling instances managed
-by one or more CloudFormation stacks.
+AWS CloudFormation power switch allows you to shutdown and startup all EC2, ECS, RDS and   
+AutoScaling instances managed by one or more CloudFormation stacks.
 
 ## install the power switch
 to install the power switch, type:
@@ -46,7 +46,9 @@ aws cloudformation deploy \
 	--stack-name aws-cloudformation-power-switch-demo \
 	--template-file ./cloudformation/demo-stack.yaml
 ```
-This deploy an ec2 instance, an autoscaling group and a RDS MySQL database instance, It will shutdown down all EC2, RDS and Auto Scaling instances managed by CloudFormation stacks starting with the name `dev` at 23:30 and start them backup at 7:30 in the morning.
+This deploy an ec2 instance, an autoscaling group and a RDS MySQL database instance, It will  
+shutdown down all EC2, RDS and Auto Scaling instances managed by CloudFormation stacks starting  
+with the name `dev` at 23:30 and start them backup at 7:30 in the morning.
 
 To manual stop all the instance, type:
 ```
@@ -68,3 +70,5 @@ aws cloudformation delete-stack --stack-name aws-cloudformation-power-switch-dem
 ## Caveats
 - The power switch will only start instances in `stopped` state`, and stop instances in the `available` or `running` state. If it is transitioning between states, no action is taken.
 - As CloudFormation does not place the `aws:cloudformation:` tags on RDS Aurora Clusters, we need to load all CloudFormation stacks and resources to find out whether we need to start or stop it. And listing all CloudFormation stacks is very, very slow...
+- the ECS services desired count is read from the latest  `started [0-9]+ tasks` event of that service
+- the auto scaling group desired count is set to the max when powering on.

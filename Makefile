@@ -91,11 +91,18 @@ delete-lambda:
 	aws cloudformation delete-stack --stack-name $(NAME)
 	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)
 
+
+demo: VPC_ID=$(shell  aws ec2  --output text --query 'Vpcs[?IsDefault].VpcId' describe-vpcs)
+demo: SUBNET_IDS=$(shell aws ec2 describe-subnets --output text \
+					 --query 'sort_by(Subnets, &AvailabilityZone)[?DefaultForAz].SubnetId' \
+					 --filters Name=vpc-id,Values=$(VPC_ID) | tr '\t' ',')
 demo:
 	aws cloudformation deploy \
 		--capabilities CAPABILITY_IAM \
 		--stack-name $(NAME)-demo \
-		--template-file ./cloudformation/demo-stack.yaml
+		--template-file ./cloudformation/demo-stack.yaml \
+		--parameter-overrides VPC=$(VPC_ID) Subnets=$(SUBNET_IDS)
+
 
 delete-demo:
 	aws cloudformation delete-stack --stack-name $(NAME)-demo

@@ -28,7 +28,7 @@ Resources:
         S3Key: !Ref 'LambdaZipFileName'
       Handler: aws_cloudformation_power_switch.handler
       Role: !GetAtt LambdaRole.Arn
-      Runtime: python3.7
+      Runtime: python3.9
       Timeout: 900
 
   Policy:
@@ -53,6 +53,10 @@ Resources:
             - autoscaling:DescribeAutoScalingGroups
             - cloudformation:DescribeStacks
             - cloudformation:ListStackResources
+            - ecs:ListClusters
+            - ecs:ListServices
+            - ecs:DescribeServices
+            -
           Resource: "*"
 
   LambdaRole:

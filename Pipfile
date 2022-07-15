@@ -12,6 +12,7 @@ twine = "*"
 
 [packages]
 aws-cloudformation-power-off = {editable = true,path = "."}
+aws-cloudformation-power-switch = {editable = true,path = "."}
 
 [requires]
-python_version = "3.7"
+python_version = "3.9"

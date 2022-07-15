@@ -3,6 +3,7 @@ from .ec2 import EC2PowerSwitch
 from .power_switch import PowerSwitch
 from .rds import RDSPowerSwitch
 from .rds_cluster import RDSClusterPowerSwitch
+from .ecs import ECSPowerSwitch
 
 
 class MasterPowerSwitch(PowerSwitch):
@@ -10,7 +11,7 @@ class MasterPowerSwitch(PowerSwitch):
         super(MasterPowerSwitch, self).__init__()
 
     def select_instances(self):
-        result = [ASGPowerSwitch(), EC2PowerSwitch(), RDSClusterPowerSwitch(), RDSPowerSwitch()]
+        result = [ASGPowerSwitch(), EC2PowerSwitch(), RDSClusterPowerSwitch(), RDSPowerSwitch(), ECSPowerSwitch(),]
         for switch in result:
             switch.session = self.session
             switch.dry_run = self.dry_run
