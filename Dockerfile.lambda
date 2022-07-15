@@ -2,8 +2,10 @@ FROM public.ecr.aws/lambda/python:3.9
 RUN yum install -y zip
 WORKDIR /lambda
 
-ADD src/ /lambda/
+ADD requirements.txt /lambda
 RUN pip install --quiet -t /lambda -r requirements.txt
+
+ADD src/ /lambda/
 RUN find /lambda -type d | xargs -n 1 -I {} chmod ugo+rx "{}" && \
     find /lambda -type f | xargs -n 1 -I {} chmod ugo+r "{}"
 
