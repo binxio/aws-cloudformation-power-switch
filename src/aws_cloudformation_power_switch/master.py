@@ -11,7 +11,13 @@ class MasterPowerSwitch(PowerSwitch):
         super(MasterPowerSwitch, self).__init__()
 
     def select_instances(self):
-        result = [ASGPowerSwitch(), EC2PowerSwitch(), RDSClusterPowerSwitch(), RDSPowerSwitch(), ECSPowerSwitch(),]
+        result = [
+            ASGPowerSwitch(),
+            EC2PowerSwitch(),
+            RDSClusterPowerSwitch(),
+            RDSPowerSwitch(),
+            ECSPowerSwitch(),
+        ]
         for switch in result:
             switch.session = self.session
             switch.dry_run = self.dry_run
@@ -32,7 +38,9 @@ class MasterPowerSwitch(PowerSwitch):
         instance.off()
 
 
-def power_switch(stack_name_prefix, dry_run=True, verbose=False, profile=None, region=None):
+def power_switch(
+    stack_name_prefix, dry_run=True, verbose=False, profile=None, region=None
+):
     result = MasterPowerSwitch()
     result.set_session(profile, region)
     result.dry_run = dry_run

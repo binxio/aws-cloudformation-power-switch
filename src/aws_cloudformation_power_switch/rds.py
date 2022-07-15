@@ -49,13 +49,12 @@ class RDSPowerSwitch(PowerSwitch):
             for instance in response["DBInstances"]:
                 arn = instance["DBInstanceArn"]
                 instance.update(self.rds.list_tags_for_resource(ResourceName=arn))
-                if 'DBClusterIdentifier' not in instance and stack_name(instance).startswith(self.stack_name_prefix):
+                if "DBClusterIdentifier" not in instance and stack_name(
+                    instance
+                ).startswith(self.stack_name_prefix):
                     result.append(instance)
 
-        result = sorted(
-            result,
-            key=lambda instance: logical_id(instance)
-        )
+        result = sorted(result, key=lambda instance: logical_id(instance))
 
         for i in filter(lambda i: self.verbose, result):
             logging.info(

@@ -28,7 +28,9 @@ class EC2PowerSwitch(PowerSwitch):
 
     def shutdown(self, instance: dict):
         instance_id = instance["InstanceId"]
-        logging.info("shutting down ec2 instance %s (%s)", logical_id(instance), instance_id)
+        logging.info(
+            "shutting down ec2 instance %s (%s)", logical_id(instance), instance_id
+        )
         if not self.dry_run:
             self.ec2.stop_instances(InstanceIds=[instance_id])
 

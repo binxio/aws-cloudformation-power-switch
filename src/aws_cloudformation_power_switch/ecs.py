@@ -21,7 +21,7 @@ class ECSPowerSwitch(PowerSwitch):
             self.ecs.update_service(
                 service=self.instance_id(instance),
                 cluster=self.cluster_id(instance),
-                desiredCount=desired_count
+                desiredCount=desired_count,
             )
 
     def desired_count(self, instance) -> int:
@@ -50,9 +50,11 @@ class ECSPowerSwitch(PowerSwitch):
     def shutdown(self, instance: dict):
         logging.info("shutting down ecs service %s", self.instance_id(instance))
         if not self.dry_run:
-            self.ecs.update_service(service=self.instance_id(instance),
-                                    cluster=self.cluster_id(instance),
-                                    desiredCount=0)
+            self.ecs.update_service(
+                service=self.instance_id(instance),
+                cluster=self.cluster_id(instance),
+                desiredCount=0,
+            )
 
     @property
     def ecs(self):

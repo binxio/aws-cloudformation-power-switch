@@ -65,7 +65,10 @@ class PowerSwitch(object):
             return
 
         self._stack_resources = []
-        logging.info("retrieving all CloudFormation stacks with prefix %s", self.stack_name_prefix)
+        logging.info(
+            "retrieving all CloudFormation stacks with prefix %s",
+            self.stack_name_prefix,
+        )
         cfn = self.session.client("cloudformation")
         for response in cfn.get_paginator("describe_stacks").paginate():
             for stack_summary in response["Stacks"]:
@@ -73,11 +76,12 @@ class PowerSwitch(object):
                 if name.startswith(self.stack_name_prefix):
                     if self.verbose:
                         logging.info("loading all resources from stack %s", name)
-                    for response in cfn.get_paginator("list_stack_resources").paginate(StackName=name):
+                    for response in cfn.get_paginator("list_stack_resources").paginate(
+                        StackName=name
+                    ):
                         for r in response["StackResourceSummaries"]:
                             r["StackName"] = name
                         self._stack_resources.extend(response["StackResourceSummaries"])
-
 
         stack_resources_per_session[self.session] = self._stack_resources
 
@@ -95,8 +99,14 @@ class PowerSwitch(object):
             key=lambda r: r["StackName"] + "-" + r["LogicalResourceId"],
         )
 
-    def get_stack_resource_by_physical_id(self, physical_resource_id:str):
-        next(filter(lambda r: r["PhysicalResourceId"] == physical_resource_id, self.stack_resources), None)
+    def get_stack_resource_by_physical_id(self, physical_resource_id: str):
+        next(
+            filter(
+                lambda r: r["PhysicalResourceId"] == physical_resource_id,
+                self.stack_resources,
+            ),
+            None,
+        )
 
 
 stack_resources_per_session = {}

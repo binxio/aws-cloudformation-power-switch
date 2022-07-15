@@ -14,7 +14,12 @@ class ASGPowerSwitch(PowerSwitch):
         name = instance["AutoScalingGroupName"]
         max_size = instance["MaxSize"]
 
-        logging.info("setting capacity of auto scaling group %s (%s) to %s", logical_id(instance), name, max_size)
+        logging.info(
+            "setting capacity of auto scaling group %s (%s) to %s",
+            logical_id(instance),
+            name,
+            max_size,
+        )
         if not self.dry_run:
             self.autoscaling.update_auto_scaling_group(
                 AutoScalingGroupName=name, DesiredCapacity=max_size
@@ -22,7 +27,11 @@ class ASGPowerSwitch(PowerSwitch):
 
     def shutdown(self, instance: dict):
         name = instance["AutoScalingGroupName"]
-        logging.info("setting capacity of auto scaling group %s (%s) to 0", logical_id(instance), name)
+        logging.info(
+            "setting capacity of auto scaling group %s (%s) to 0",
+            logical_id(instance),
+            name,
+        )
         if not self.dry_run:
             self.autoscaling.update_auto_scaling_group(
                 AutoScalingGroupName=name, DesiredCapacity=0, MinSize=0
@@ -53,12 +62,12 @@ class ASGPowerSwitch(PowerSwitch):
             )
 
         for i in filter(lambda i: self.verbose, result):
-                logging.info(
-                    "found auto scaling group %s (%s) with desired capacity %s",
-                    logical_id(i),
-                    i["AutoScalingGroupName"],
-                    i["DesiredCapacity"],
-                )
+            logging.info(
+                "found auto scaling group %s (%s) with desired capacity %s",
+                logical_id(i),
+                i["AutoScalingGroupName"],
+                i["DesiredCapacity"],
+            )
 
         if not result and self.verbose:
             logging.info("No auto scaling groups found")

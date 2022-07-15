@@ -5,38 +5,24 @@ from .master import power_switch
 
 schema = {
     "type": "object",
-    "required": [ "stack_name_prefix"],
+    "required": ["stack_name_prefix"],
     "properties": {
-        "stack_name_prefix": {
-            "type": "string"
-        },
-        "profile": {
-            "type": "string"
-        },
-        "region": {
-            "type": "string"
-        },
-        "verbose": {
-            "type": "boolean",
-            "default": True
-        },
-        "dry_run": {
-            "type": "boolean",
-            "default": False
-        },
-        "state": {
-            "type": "string",
-            "enum": ["on", "off"]
-        }
-    }
+        "stack_name_prefix": {"type": "string"},
+        "profile": {"type": "string"},
+        "region": {"type": "string"},
+        "verbose": {"type": "boolean", "default": True},
+        "dry_run": {"type": "boolean", "default": False},
+        "state": {"type": "string", "enum": ["on", "off"]},
+    },
 }
+
 
 def is_valid_request(request) -> bool:
     try:
         jsonschema.validate(request, schema)
         return True
     except jsonschema.ValidationError as e:
-        logging.error('invalid request received: %s' % str(e.context))
+        logging.error("invalid request received: %s" % str(e.context))
         return False
 
 
