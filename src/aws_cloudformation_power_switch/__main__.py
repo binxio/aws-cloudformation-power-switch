@@ -25,13 +25,13 @@ def main(ctx, **kwargs):
     ctx.obj = power_switch(**kwargs)
 
 
-@main.command(name="on", help="start all ec2, rds and auto scaling instances")
+@main.command(name="on", help="start all ec2, ecs, rds and auto scaling instances")
 @click.pass_context
 def on(ctx):
     ctx.obj.on()
 
 
-@main.command(name="off", help="stop all ec2, rds and auto scaling instances")
+@main.command(name="off", help="stop all ec2, ecs, rds and auto scaling instances")
 @click.pass_context
 def off(ctx):
     ctx.obj.off()
