@@ -7,7 +7,7 @@ Parameters:
     Default: ''
   LambdaZipFileName:
     Type: String
-    Default: lambdas/aws-cloudwatch-power-switch-0.2.4.zip
+    Default: lambdas/aws-cloudformation-power-switch-1.0.5.zip
 
 Conditions:
   UsePublicBucket: !Equals
