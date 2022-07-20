@@ -56,6 +56,7 @@ Resources:
             - ecs:ListClusters
             - ecs:ListServices
             - ecs:DescribeServices
+            - ecs:UpdateService
             - tag:GetResources
           Resource: "*"
 
